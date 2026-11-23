@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Phone Repair 3D - Ustaxona</title>
+<style>
+  :root {
+    --bg-main: #000000;
+    --panel-bg: #0a0a0a;
+    --card-bg: #141414;
+    --border-col: #262626;
+    --text-main: #ffffff;
+    --text-sub: #a3a3a3;
+    --grid-line: rgba(255, 255, 255, 0.05);
+  }
+
+  body.light-mode,
+  body.light-mode .workspace,
+  body.light-mode .top-bar,
+  body.light-mode .client-card,
+  body.light-mode .bottom-panel,
+  body.light-mode .modal-content {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body.light-mode {
+    --bg-main: #ffffff;
+    --panel-bg: #ffffff;
+    --card-bg: #f4f4f5;
+    --border-col: #d4d4d8;
+    --text-main: #000000;
+    --text-sub: #52525b;
+    --grid-line: rgba(0, 0, 0, 0.06);
+  }
+
+  body.light-mode .part-card,
+  body.light-mode .menu-btn,
+  body.light-mode .hint-pill,
+  body.light-mode .desk-badge,
+  body.light-mode .shop-item,
+  body.light-mode .setting-row,
+  body.light-mode .close-btn {
+    background-color: #f4f4f5 !important;
+    color: #000000 !important;
+    border-color: #d4d4d8 !important;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* --- 3 SONIYALIK ZAGRUZKA EKRANI --- */
+  .loader-screen {
+    position: fixed;
+    inset: 0;
+    background-color: #000000;
+    color: #ffffff;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    transition: opacity 0.35s ease;
+  }
+  .loader-screen.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader-icon {
+    font-size: 52px;
+    margin-bottom: 14px;
+    animation: bounceTool 0.9s infinite alternate;
+  }
+  @keyframes bounceTool {
+    from { transform: translateY(0) rotate(-8deg); }
+    to { transform: translateY(-8px) rotate(8deg); }
+  }
+  .loader-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .loader-sub {
+    font-size: 12px;
+    color: #a3a3a3;
+    margin-bottom: 22px;
+  }
+  .progress-box {
+    width: 100%;
+    max-width: 280px;
+    height: 14px;
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 2px;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2563eb, #38bdf8, #4ade80);
+    border-radius: 20px;
+  }
+  .progress-percent {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #38bdf8;
+  }
+
+  /* Yuqori panel */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border-col);
+    z-index: 50;
+    flex-shrink: 0;
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .money-box {
+    font-size: 15px;
+    font-weight: 800;
+    color: #16a34a;
+    background-color: rgba(22, 163, 74, 0.14);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(22, 163, 74, 0.4);
+  }
+  .menu-btn {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-col);
+    color: var(--text-main);
+    padding: 6px 11px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  /* Mijoz kartasi */
+  .client-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border-col);
+    font-size: 12.5px;
+    line-height: 1.4;
+    z-index: 40;
+    flex-shrink: 0;
+  }
+  .client-info span { color: var(--text-sub); }
+  .client-info b { color: var(--text-main); }
+  .right-badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+  }
+  .badge {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  .bonus-pill {
+    background-color: rgba(217, 119, 6, 0.18);
+    color: #f59e0b;
+    border: 1px solid rgba(217, 119, 6, 0.45);
+    padding: 3px 8px;
+    border-radius: 7px;
+    font-weight: 800;
+    font-size: 10px;
+  }
+
+  /* Yo'riqnoma */
+  .hint-wrapper {
+    text-align: center;
+    margin-top: 7px;
+    z-index: 30;
+    flex-shrink: 0;
+  }
+  .hint-pill {
+    display: inline-block;
+    background-color: var(--card-bg);
+    border: 1px solid #0284c7;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  /* Ustaxona ish stoli */
+  .workspace {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-main);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 26px 26px;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .workspace.desk-lvl-2 { box-shadow: inset 0 0 40px rgba(16, 185, 129, 0.22); }
+  .workspace.desk-lvl-3 { box-shadow: inset 0 0 50px rgba(56, 189, 248, 0.26); }
+  .workspace.desk-lvl-4 { box-shadow: inset 0 0 60px rgba(245, 158, 11, 0.3); }
+
+  /* Stol ma'lumoti - telefon bilan to'qnashmaydigan yuqori chapda */
+  .desk-badge {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-col);
+    color: var(--text-sub);
+    padding: 5px 9px;
+    border-radius: 9px;
+    font-size: 10px;
+    line-height: 1.35;
+    z-index: 25;
+    pointer-events: none;
+  }
+  .desk-badge b { color: var(--text-main); }
+
+  /* 3D ko'rinishli telefon korpusi (ochilganda joy berish uchun o'ngroqqa surilgan) */
+  .phone-chassis {
+    width: 196px;
+    height: 340px;
+    background-color: #121212;
+    border-radius: 28px;
+    border: 4px solid #64748b;
+    position: relative;
+    padding: 11px;
+    margin-left: 42px;
+    box-shadow:
+      6px 10px 0px #27272a,
+      11px 16px 0px #18181b,
+      20px 30px 45px rgba(0,0,0,0.55),
+      inset 0 0 16px rgba(0,0,0,0.9);
+    z-index: 10;
+    transition: border-color 0.3s, border-radius 0.3s;
+  }
+
+  .internal-grid {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .slot {
+    position: absolute;
+    border: 1.5px dashed #52525b;
+    border-radius: 9px;
+    background-color: rgba(24, 24, 27, 0.92);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    color: #a1a1aa;
+    font-weight: 600;
+  }
+  .slot.highlight {
+    border: 2px solid #38bdf8;
+    background-color: rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+  }
+
+  #slot-camera   { top: 2px; left: 2px; width: 62px; height: 90px; }
+  #slot-board    { top: 2px; right: 2px; width: 96px; height: 90px; }
+  #slot-battery  { top: 98px; left: 2px; width: 164px; height: 148px; }
+  #slot-speaker  { bottom: 2px; left: 2px; width: 90px; height: 46px; }
+  #slot-port     { bottom: 2px; right: 2px; width: 66px; height: 46px; }
+
+  .installed-part {
+    width: 100%;
+    height: 100%;
+    border-radius: 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+    position: relative;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.25);
+    touch-action: none;
+  }
+  .installed-part.broken {
+    border: 2px solid #ef4444;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.85);
+  }
+  .installed-part.broken::after {
+    content: "NOSOZ";
+    position: absolute;
+    bottom: 3px;
+    background-color: #ef4444;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .vis-camera { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #475569; }
+  .lens-dots { display: flex; flex-direction: column; gap: 4px; }
+  .lens {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: radial-gradient(circle, #38bdf8 15%, #020617 70%);
+    border: 2px solid #64748b;
+  }
+  .vis-board { background: linear-gradient(135deg, #059669, #064e3b); border: 1px solid #34d399; font-size: 10px; font-weight: 800; }
+  .vis-battery { background: linear-gradient(180deg, #475569, #1e293b); border: 1px solid #94a3b8; font-size: 11px; font-weight: 800; }
+  .vis-speaker { background: #1e293b; border: 1px solid #64748b; font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+  .vis-port { background: #334155; border: 1px solid #94a3b8; font-size: 9px; font-weight: 800; }
+
+  /* Telefonning 3D ORQA QOPQOG'I */
+  .back-cover {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 196px;
+    height: 340px;
+    border-radius: 28px;
+    border: 2.5px solid rgba(255,255,255,0.45);
+    box-shadow:
+      4px 8px 20px rgba(0,0,0,0.5),
+      inset 0 2px 6px rgba(255,255,255,0.4),
+      inset 0 -4px 10px rgba(0,0,0,0.45);
+    z-index: 20;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+  }
+  .back-cover::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -40%;
+    width: 180%;
+    height: 180%;
+    background: linear-gradient(125deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.02) 45%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .cam-module {
+    position: absolute;
+    box-shadow: 2px 5px 12px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cam-lens-3d {
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #38bdf8 6%, #1d4ed8 28%, #020617 70%);
+    border: 2px solid #cbd5e1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+  }
+
+  .cam-iphone {
+    top: 14px; left: 14px; width: 76px; height: 76px; border-radius: 18px;
+    background: rgba(255,255,255,0.16); border: 1.5px solid rgba(255,255,255,0.35);
+  }
+  .cam-iphone .l1 { position: absolute; top: 8px; left: 8px; width: 25px; height: 25px; }
+  .cam-iphone .l2 { position: absolute; bottom: 8px; left: 8px; width: 25px; height: 25px; }
+  .cam-iphone .l3 { position: absolute; top: 25px; right: 8px; width: 25px; height: 25px; }
+
+  .cam-samsung {
+    top: 16px; left: 16px; width: 60px; height: 108px;
+    background: transparent; box-shadow: none;
+  }
+  .cam-samsung .l1 { position: absolute; top: 0; left: 0; width: 24px; height: 24px; }
+  .cam-samsung .l2 { position: absolute; top: 30px; left: 0; width: 24px; height: 24px; }
+  .cam-samsung .l3 { position: absolute; top: 60px; left: 0; width: 24px; height: 24px; }
+  .cam-samsung .l4 { position: absolute; top: 15px; right: 2px; width: 16px; height: 16px; }
+
+  .cam-xiaomi {
+    top: 18px; left: 50%; transform: translateX(-50%);
+    width: 88px; height: 88px; border-radius: 50%;
+    background-color: #111827; border: 3px solid #eab308;
+  }
+  .cam-xiaomi .l1 { position: absolute; top: 12px; left: 16px; width: 21px; height: 21px; }
+  .cam-xiaomi .l2 { position: absolute; top: 12px; right: 16px; width: 21px; height: 21px; }
+  .cam-xiaomi .l3 { position: absolute; bottom: 12px; left: 16px; width: 21px; height: 21px; }
+  .cam-xiaomi .l4 { position: absolute; bottom: 12px; right: 16px; width: 21px; height: 21px; }
+
+  .cam-pixel {
+    top: 22px; left: 50%; transform: translateX(-50%);
+    width: 144px; height: 42px; border-radius: 21px;
+    background-color: #1f2937; border: 2px solid #cbd5e1; gap: 10px;
+  }
+  .cam-pixel .l1, .cam-pixel .l2, .cam-pixel .l3 { width: 23px; height: 23px; }
+
+  .cam-nothing {
+    top: 16px; left: 16px; width: 46px; height: 84px; border-radius: 23px;
+    background: rgba(255,255,255,0.15); border: 2px solid #fff;
+    flex-direction: column; gap: 8px;
+  }
+  .cam-nothing .l1, .cam-nothing .l2 { width: 24px; height: 24px; }
+
+  .brand-title {
+    margin-top: 86px;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  }
+  .brand-sub {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-top: 4px;
+    opacity: 0.92;
+  }
+
+  /* Chiqindi qutisi */
+  .trash-bin {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 68px;
+    height: 68px;
+    background-color: rgba(220, 38, 38, 0.2);
+    border: 2px dashed #ef4444;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ef4444;
+    font-size: 10.5px;
+    font-weight: 800;
+    z-index: 15;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  .trash-bin.active {
+    transform: scale(1.14);
+    background-color: rgba(220, 38, 38, 0.9);
+    color: #fff;
+  }
+
+  /* Pastki panel */
+  .bottom-panel {
+    background-color: var(--panel-bg);
+    border-top: 1px solid var(--border-col);
+    padding: 8px 12px 12px;
+    z-index: 50;
+    flex-shrink: 0;
+  }
+  .inv-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .parts-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .part-card {
+    flex: 1;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-col);
+    border-radius: 11px;
+    padding: 7px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: grab;
+    touch-action: none;
+  }
+  .part-card.empty { opacity: 0.4; cursor: not-allowed; }
+  .part-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    margin-bottom: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px;
+    color: #fff;
+  }
+  .part-name { font-size: 9.5px; color: var(--text-main); font-weight: 700; }
+  .part-count { font-size: 9.5px; color: var(--text-sub); font-weight: 700; margin-top: 1px; }
+
+  .nav-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+  }
+  .btn {
+    border: none;
+    padding: 10px 4px;
+    border-radius: 10px;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-repair { background-color: #16a34a; }
+  .btn-shop   { background-color: #d97706; }
+  .btn-work   { background-color: #2563eb; }
+  .btn-set    { background-color: #52525b; }
+
+  .dragging-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.65);
+  }
+
+  /* Modallar */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  .modal.open { display: flex; }
+  .modal-content {
+    background-color: var(--panel-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border-col);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 350px;
+    padding: 16px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 800;
+    font-size: 15px;
+  }
+  .close-btn {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-col);
+    color: var(--text-main);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .shop-item, .setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-col);
+    padding: 10px 12px;
+    border-radius: 11px;
+    margin-bottom: 8px;
+  }
+  .buy-btn {
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .buy-btn:disabled { background-color: #71717a; cursor: not-allowed; }
+
+  .toggle-group { display: flex; gap: 5px; }
+  .toggle-btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-col);
+    background-color: var(--panel-bg);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .toggle-btn.active {
+    background-color: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+  }
+
+  .toast {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #18181b;
+    border: 1px solid #38bdf8;
+    color: #fff;
+    padding: 7px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 300;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+  <!-- 3 Soniyalik Zagruzka ekrani -->
+  <div class="loader-screen" id="loader-screen">
+    <div class="loader-icon">🔧📱</div>
+    <div class="loader-title">PHONE REPAIR 3D</div>
+    <div class="loader-sub">Ustaxona va 3D detallar yuklanmoqda...</div>
+    <div class="progress-box">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-percent" id="progress-percent">0%</div>
+  </div>
+
+  <div class="top-bar">
+    <div class="logo">🔧 PHONE REPAIR 3D</div>
+    <div class="money-box">💰 $<span id="money">650</span></div>
+    <button class="menu-btn" id="btn-refresh" title="Keyingi mijoz">↻</button>
+  </div>
+
+  <div class="client-card">
+    <div class="client-info">
+      <div><span>Mijoz:</span> <b id="client-name">Sardor</b></div>
+      <div><span>Telefon:</span> <b id="phone-model">iPhone 16 Pro Max</b></div>
+      <div><span>Muammo:</span> <b id="problem-text" style="color:#ef4444;">Kamera</b></div>
+    </div>
+    <div class="right-badges">
+      <div class="badge" id="tier-badge">APPLE</div>
+      <div class="bonus-pill" id="top-bonus">BONUS +0%</div>
+    </div>
+  </div>
+
+  <div class="hint-wrapper">
+    <div class="hint-pill" id="hint-text">1-qadam: Qopqoqni barmoq bilan surib oching</div>
+  </div>
+
+  <div class="workspace" id="workspace">
+    <div class="desk-badge" id="desk-info">
+      🛠️ Stol: <b>Yog'och stol (Lvl 1)</b><br>
+      💵 Bonus: <b>+0%</b>
+    </div>
+
+    <div class="phone-chassis" id="phone-chassis">
+      <div class="internal-grid">
+        <div class="slot" id="slot-camera">Kamera</div>
+        <div class="slot" id="slot-board">Plata</div>
+        <div class="slot" id="slot-battery">Batareya</div>
+        <div class="slot" id="slot-speaker">Dinamik</div>
+        <div class="slot" id="slot-port">Port</div>
+      </div>
+
+      <!-- Telefonning 3D orqa qopqog'i -->
+      <div class="back-cover" id="back-cover">
+        <div id="camera-design"></div>
+        <div class="brand-title" id="cover-brand"></div>
+        <div class="brand-sub" id="cover-sub">IPHONE 16 PRO MAX</div>
+      </div>
+    </div>
+
+    <div class="trash-bin" id="trash-bin">
+      <span style="font-size:20px;">🗑️</span>
+      <span>Chiqindi</span>
+    </div>
+  </div>
+
+  <div class="bottom-panel">
+    <div class="inv-header">
+      <span>🧰 Ehtiyot qismlar</span>
+      <span id="total-parts">8 ta detal</span>
+    </div>
+    <div class="parts-row" id="inventory-row"></div>
+    <div class="nav-buttons">
+      <button class="btn btn-repair" id="btn-repair">✓ Ta'mirlash</button>
+      <button class="btn btn-shop" id="btn-shop">🛒 Do'kon</button>
+      <button class="btn btn-work" id="btn-work">🛠️ Ustaxona</button>
+      <button class="btn btn-set" id="btn-set">⚙️ Sozlama</button>
+    </div>
+  </div>
+
+  <!-- Do'kon oynasi -->
+  <div class="modal" id="shop-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>🛒 Ehtiyot qismlar do'koni</span>
+        <button class="close-btn" data-close="shop-modal">✕</button>
+      </div>
+      <div id="shop-list"></div>
+    </div>
+  </div>
+
+  <!-- Ustaxona yaxshilash oynasi -->
+  <div class="modal" id="workshop-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>🛠️ Ustaxonani yaxshilash</span>
+        <button class="close-btn" data-close="workshop-modal">✕</button>
+      </div>
+      <p style="font-size:11.5px; color:var(--text-sub); margin-top:0;">
+        Ta'mirlash stolini yaxshilang: stol dizayni o'zgaradi va har bir buyurtmadan daromad oshadi!
+      </p>
+      <div id="workshop-list"></div>
+    </div>
+  </div>
+
+  <!-- Sozlamalar oynasi -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>⚙️ O'yin sozlamalari</span>
+        <button class="close-btn" data-close="settings-modal">✕</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <b>🔊 O'yin ovozi</b>
+          <div style="font-size:11px; color:var(--text-sub);">Tovush effektlari</div>
+        </div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="sound-on-btn">Yoqish</button>
+          <button class="toggle-btn" id="sound-off-btn">O'chirish</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div>
+          <b>🌓 Ekran rejimi</b>
+          <div style="font-size:11px; color:var(--text-sub);">Qora yoki oq rejim</div>
+        </div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="theme-dark-btn">🌙 Qorong'u</button>
+          <button class="toggle-btn" id="theme-light-btn">☀️ Kunduzgi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  const SAVE_KEY = 'phone_repair_3d_save_v1';
+
+  // --- O'YIN HOLATI VA SAQLASH ---
+  let money = 650;
+  let deskLevel = 1;
+  let inventory = { battery: 2, board: 1, camera: 2, port: 1, speaker: 2 };
+  let soundEnabled = true;
+  let themeMode = 'dark';
+
+  function saveGame() {
+    try {
+      const data = { money, deskLevel, inventory, soundEnabled, themeMode };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    } catch (_) {}
+  }
+
+  function loadGame() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (typeof data.money === 'number') money = data.money;
+      if (typeof data.deskLevel === 'number') deskLevel = data.deskLevel;
+      if (data.inventory) inventory = Object.assign(inventory, data.inventory);
+      if (typeof data.soundEnabled === 'boolean') soundEnabled = data.soundEnabled;
+      if (data.themeMode === 'light' || data.themeMode === 'dark') themeMode = data.themeMode;
+    } catch (_) {}
+  }
+
+  loadGame();
+
+  // --- 3 SONIYALIK ZAGRUZKA LOGIKASI (0% -> 100%) ---
+  (function startLoader() {
+    const loader = document.getElementById('loader-screen');
+    const fill = document.getElementById('progress-fill');
+    const pctText = document.getElementById('progress-percent');
+    const duration = 3000;
+    const startTime = performance.now();
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(100, Math.floor((elapsed / duration) * 100));
+      fill.style.width = progress + '%';
+      pctText.innerText = progress + '%';
+
+      if (progress < 100) {
+        requestAnimationFrame(step);
+      } else {
+        setTimeout(() => {
+          loader.classList.add('hide');
+          setTimeout(() => { loader.style.display = 'none'; }, 380);
+        }, 120);
+      }
+    }
+    requestAnimationFrame(step);
+  })();
+
+  // --- OVOZ TIZIMI ---
+  let audioCtx = null;
+  function initAudio() {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audioCtx = new Ctx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playTone(freq, type, duration, vol = 0.14, slideTo = null) {
+    if (!soundEnabled) return;
+    initAudio();
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    if (slideTo) {
+      osc.frequency.exponentialRampToValueAtTime(slideTo, audioCtx.currentTime + duration);
+    }
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }
+
+  const playClick = () => playTone(520, 'sine', 0.06, 0.1);
+  const playSlide = () => playTone(220, 'triangle', 0.16, 0.14, 430);
+  const playTrash = () => playTone(190, 'sawtooth', 0.2, 0.14, 80);
+  const playSnap  = () => playTone(440, 'sine', 0.12, 0.16, 780);
+  const playError = () => playTone(160, 'square', 0.16, 0.11, 115);
+  const playCoin  = () => {
+    playTone(987, 'sine', 0.1, 0.15);
+    setTimeout(() => playTone(1318, 'sine', 0.22, 0.16), 90);
+  };
+
+  const deskUpgrades = [
+    { level: 1, name: "Yog'och stol", bonus: 0, cost: 0, desc: "Boshlang'ich ustaxona stoli" },
+    { level: 2, name: "Yashil ESD stol", bonus: 25, cost: 350, desc: "Daromad +25% oshadi" },
+    { level: 3, name: "Kiber-LED stol", bonus: 55, cost: 800, desc: "Daromad +55% oshadi" },
+    { level: 4, name: "Oltin VIP stol", bonus: 100, cost: 1500, desc: "Daromad +100% (2x) oshadi" }
+  ];
+
+  const partsMeta = {
+    battery: { name: "Batareya", price: 60, icon: "🔋", visClass: "vis-battery", label: "5000mAh" },
+    board:   { name: "Plata", price: 110, icon: "🟩", visClass: "vis-board", label: "CHIP" },
+    camera:  { name: "Kamera", price: 80, icon: "📷", visClass: "vis-camera", label: "" },
+    port:    { name: "Port", price: 45, icon: "🔌", visClass: "vis-port", label: "USB-C" },
+    speaker: { name: "Dinamik", price: 40, icon: "🔊", visClass: "vis-speaker", label: "|||||" }
+  };
+
+  const realPhones = [
+    { model: "iPhone 16 Pro Max", brand: "APPLE", logoText: "", colorBg: "linear-gradient(145deg, #c2ab96, #7a6b5d)", frameColor: "#d6c3b2", textColor: "#fff", radius: "32px", camStyle: "iphone", reward: 220 },
+    { model: "iPhone 15 Pro Blue", brand: "APPLE", logoText: "", colorBg: "linear-gradient(145deg, #3b5978, #1a293a)", frameColor: "#6488aa", textColor: "#e0f2fe", radius: "32px", camStyle: "iphone", reward: 200 },
+    { model: "iPhone 14 Purple", brand: "APPLE", logoText: "", colorBg: "linear-gradient(145deg, #d8b4fe, #7e22ce)", frameColor: "#c084fc", textColor: "#faf5ff", radius: "32px", camStyle: "iphone", reward: 175 },
+    { model: "Galaxy S24 Ultra", brand: "SAMSUNG", logoText: "SAMSUNG", colorBg: "linear-gradient(145deg, #4f4278, #1c1733)", frameColor: "#a1a1aa", textColor: "#f8fafc", radius: "10px", camStyle: "samsung", reward: 215 },
+    { model: "Galaxy S23 Green", brand: "SAMSUNG", logoText: "SAMSUNG", colorBg: "linear-gradient(145deg, #4d7054, #1f3023)", frameColor: "#86efac", textColor: "#ecfdf5", radius: "26px", camStyle: "samsung", reward: 185 },
+    { model: "Galaxy A55 Sky", brand: "SAMSUNG", logoText: "SAMSUNG", colorBg: "linear-gradient(145deg, #7dd3fc, #0284c7)", frameColor: "#bae6fd", textColor: "#082f49", radius: "26px", camStyle: "samsung", reward: 145 },
+    { model: "Xiaomi 14 Ultra", brand: "XIAOMI", logoText: "XIAOMI", colorBg: "linear-gradient(145deg, #27272a, #09090b)", frameColor: "#eab308", textColor: "#facc15", radius: "28px", camStyle: "xiaomi", reward: 195 },
+    { model: "Redmi Note 13 Pro+", brand: "REDMI", logoText: "Redmi", colorBg: "linear-gradient(145deg, #e879f9, #a21caf)", frameColor: "#f0abfc", textColor: "#fdf4ff", radius: "26px", camStyle: "samsung", reward: 140 },
+    { model: "POCO X6 Pro Yellow", brand: "POCO", logoText: "POCO", colorBg: "linear-gradient(145deg, #facc15, #ca8a04)", frameColor: "#18181b", textColor: "#18181b", radius: "24px", camStyle: "iphone", reward: 150 },
+    { model: "Google Pixel 9 Pro", brand: "GOOGLE", logoText: "G", colorBg: "linear-gradient(145deg, #f472b6, #be185d)", frameColor: "#fbcfe8", textColor: "#fff1f2", radius: "30px", camStyle: "pixel", reward: 190 },
+    { model: "Google Pixel 8 Mint", brand: "GOOGLE", logoText: "G", colorBg: "linear-gradient(145deg, #6ee7b7, #047857)", frameColor: "#a7f3d0", textColor: "#022c22", radius: "30px", camStyle: "pixel", reward: 165 },
+    { model: "Nothing Phone (2a)", brand: "NOTHING", logoText: "NOTHING", colorBg: "linear-gradient(145deg, #f1f5f9, #cbd5e1)", frameColor: "#94a3b8", textColor: "#0f172a", radius: "28px", camStyle: "nothing", reward: 170 },
+    { model: "HONOR Magic6 Pro", brand: "HONOR", logoText: "HONOR", colorBg: "linear-gradient(145deg, #0f766e, #042f2e)", frameColor: "#eab308", textColor: "#fef08a", radius: "28px", camStyle: "xiaomi", reward: 185 },
+    { model: "OnePlus 12 Emerald", brand: "ONEPLUS", logoText: "1+", colorBg: "linear-gradient(145deg, #10b981, #064e3b)", frameColor: "#34d399", textColor: "#ecfdf5", radius: "28px", camStyle: "xiaomi", reward: 180 }
+  ];
+
+  const clientNames = ["Sardor", "Malika", "Javohir", "Dilnoza", "Bekzod", "Madina", "Azizbek", "Zarina", "Shahzod", "Nilufar"];
+  const problemTypes = ["camera", "battery", "board", "port", "speaker"];
+
+  let lastPhoneIndex = -1;
+  let currentOrder = null;
+  let coverOpen = false;
+  let coverPos = { x: -4, y: -4 };
+
+  function applySavedVisuals() {
+    document.body.classList.toggle('light-mode', themeMode === 'light');
+    document.getElementById('theme-light-btn').classList.toggle('active', themeMode === 'light');
+    document.getElementById('theme-dark-btn').classList.toggle('active', themeMode === 'dark');
+
+    document.getElementById('sound-on-btn').classList.toggle('active', soundEnabled);
+    document.getElementById('sound-off-btn').classList.toggle('active', !soundEnabled);
+
+    const info = deskUpgrades.find(d => d.level === deskLevel) || deskUpgrades[0];
+    document.getElementById('workspace').className = `workspace desk-lvl-${info.level}`;
+    document.getElementById('desk-info').innerHTML = `🛠️ Stol: <b>${info.name} (Lvl ${info.level})</b><br>💵 Bonus: <b>+${info.bonus}%</b>`;
+    document.getElementById('top-bonus').innerText = `BONUS +${info.bonus}%`;
+    document.getElementById('money').innerText = money;
+  }
+
+  // --- QOPQOQNI SURISH (Ichki detallarni to'liq ochiq ko'rsatadigan qilib) ---
+  const backCover = document.getElementById('back-cover');
+  let isDraggingCover = false;
+  let coverStart = { x: 0, y: 0 };
+
+  backCover.addEventListener('pointerdown', (e) => {
+    initAudio();
+    isDraggingCover = true;
+    coverStart.x = e.clientX - coverPos.x;
+    coverStart.y = e.clientY - coverPos.y;
+    backCover.style.transition = 'none';
+    backCover.setPointerCapture(e.pointerId);
+  });
+
+  backCover.addEventListener('pointermove', (e) => {
+    if (!isDraggingCover) return;
+    coverPos.x = e.clientX - coverStart.x;
+    coverPos.y = e.clientY - coverStart.y;
+    backCover.style.left = coverPos.x + 'px';
+    backCover.style.top = coverPos.y + 'px';
+
+    const dist = Math.hypot(coverPos.x + 4, coverPos.y + 4);
+    coverOpen = dist > 95;
+    backCover.style.opacity = coverOpen ? '0.65' : '1';
+    updateHint();
+  });
+
+  backCover.addEventListener('pointerup', (e) => {
+    if (!isDraggingCover) return;
+    isDraggingCover = false;
+    try { backCover.releasePointerCapture(e.pointerId); } catch (_) {}
+    backCover.style.transition = 'all 0.25s ease';
+    playSlide();
+
+    const dist = Math.hypot(coverPos.x + 4, coverPos.y + 4);
+    if (dist <= 95) {
+      coverPos = { x: -4, y: -4 };
+      backCover.style.left = '-4px';
+      backCover.style.top = '-4px';
+      backCover.style.transform = 'scale(1)';
+      backCover.style.opacity = '1';
+      coverOpen = false;
+    } else {
+      // Telefon ichidagi kamera va boshqa detallar umuman yopilmasligi uchun chapga kichraytirib suriladi
+      coverPos = { x: -205, y: 12 };
+      backCover.style.left = coverPos.x + 'px';
+      backCover.style.top = coverPos.y + 'px';
+      backCover.style.transform = 'scale(0.62)';
+      backCover.style.opacity = '0.75';
+      coverOpen = true;
+    }
+    updateHint();
+  });
+
+  function renderCameraModule(style) {
+    const c = document.getElementById('camera-design');
+    if (style === 'iphone') {
+      c.innerHTML = `<div class="cam-module cam-iphone"><div class="cam-lens-3d l1"></div><div class="cam-lens-3d l2"></div><div class="cam-lens-3d l3"></div></div>`;
+    } else if (style === 'samsung') {
+      c.innerHTML = `<div class="cam-module cam-samsung"><div class="cam-lens-3d l1"></div><div class="cam-lens-3d l2"></div><div class="cam-lens-3d l3"></div><div class="cam-lens-3d l4"></div></div>`;
+    } else if (style === 'xiaomi') {
+      c.innerHTML = `<div class="cam-module cam-xiaomi"><div class="cam-lens-3d l1"></div><div class="cam-lens-3d l2"></div><div class="cam-lens-3d l3"></div><div class="cam-lens-3d l4"></div></div>`;
+    } else if (style === 'pixel') {
+      c.innerHTML = `<div class="cam-module cam-pixel"><div class="cam-lens-3d l1"></div><div class="cam-lens-3d l2"></div><div class="cam-lens-3d l3"></div></div>`;
+    } else if (style === 'nothing') {
+      c.innerHTML = `<div class="cam-module cam-nothing"><div class="cam-lens-3d l1"></div><div class="cam-lens-3d l2"></div></div>`;
+    }
+  }
+
+  function newOrder() {
+    let pIdx;
+    do { pIdx = Math.floor(Math.random() * realPhones.length); } while (pIdx === lastPhoneIndex);
+    lastPhoneIndex = pIdx;
+
+    const phone = realPhones[pIdx];
+    const cName = clientNames[Math.floor(Math.random() * clientNames.length)];
+    const prob = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+
+    currentOrder = { name: cName, phoneData: phone, problem: prob, reward: phone.reward };
+
+    document.getElementById('client-name').innerText = cName;
+    document.getElementById('phone-model').innerText = phone.model;
+    document.getElementById('problem-text').innerText = partsMeta[prob].name;
+    document.getElementById('tier-badge').innerText = phone.brand;
+
+    const chassis = document.getElementById('phone-chassis');
+    chassis.style.borderColor = phone.frameColor;
+    chassis.style.borderRadius = phone.radius;
+
+    backCover.style.background = phone.colorBg;
+    backCover.style.borderRadius = phone.radius;
+    backCover.style.color = phone.textColor;
+
+    document.getElementById('cover-brand').innerText = phone.logoText;
+    document.getElementById('cover-sub').innerText = phone.model.toUpperCase();
+    renderCameraModule(phone.camStyle);
+
+    coverOpen = false;
+    coverPos = { x: -4, y: -4 };
+    backCover.style.transition = 'none';
+    backCover.style.left = '-4px';
+    backCover.style.top = '-4px';
+    backCover.style.transform = 'scale(1)';
+    backCover.style.opacity = '1';
+
+    Object.keys(partsMeta).forEach(type => {
+      const slot = document.getElementById('slot-' + type);
+      slot.innerHTML = '';
+      createInstalledPart(slot, type, type === prob);
+    });
+
+    renderInventory();
+    updateHint();
+  }
+
+  function createInstalledPart(slot, type, isBroken) {
+    const meta = partsMeta[type];
+    const el = document.createElement('div');
+    el.className = `installed-part ${meta.visClass} ${isBroken ? 'broken' : ''}`;
+    el.dataset.broken = isBroken ? '1' : '0';
+
+    if (type === 'camera') {
+      el.innerHTML = `<div class="lens-dots"><div class="lens"></div><div class="lens"></div><div class="lens"></div></div>`;
+    } else {
+      el.innerText = meta.label;
+    }
+
+    let draggingPart = false;
+    let ghost = null;
+    const trash = document.getElementById('trash-bin');
+
+    el.addEventListener('pointerdown', (e) => {
+      if (!coverOpen) {
+        playError();
+        showToast("Avval orqa qopqoqni surib oching!");
+        return;
+      }
+      e.stopPropagation();
+      draggingPart = true;
+      el.style.opacity = '0.3';
+
+      ghost = el.cloneNode(true);
+      ghost.style.width = el.offsetWidth + 'px';
+      ghost.style.height = el.offsetHeight + 'px';
+      ghost.classList.add('dragging-ghost');
+      ghost.style.left = e.clientX + 'px';
+      ghost.style.top = e.clientY + 'px';
+      document.body.appendChild(ghost);
+      el.setPointerCapture(e.pointerId);
+    });
+
+    el.addEventListener('pointermove', (e) => {
+      if (!draggingPart || !ghost) return;
+      ghost.style.left = e.clientX + 'px';
+      ghost.style.top = e.clientY + 'px';
+      const r = trash.getBoundingClientRect();
+      trash.classList.toggle('active', e.clientX >= r.left - 12 && e.clientX <= r.right + 12 && e.clientY >= r.top - 12 && e.clientY <= r.bottom + 12);
+    });
+
+    el.addEventListener('pointerup', (e) => {
+      if (!draggingPart) return;
+      draggingPart = false;
+      try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+      if (ghost) ghost.remove();
+      trash.classList.remove('active');
+
+      const r = trash.getBoundingClientRect();
+      const inTrash = (e.clientX >= r.left - 14 && e.clientX <= r.right + 14 && e.clientY >= r.top - 14 && e.clientY <= r.bottom + 14);
+
+      if (inTrash) {
+        if (el.dataset.broken === '1') {
+          playTrash();
+          slot.innerHTML = meta.name;
+          showToast("Nosoz detal chiqindiga tashlandi!");
+          updateHint();
+        } else {
+          playError();
+          el.style.opacity = '1';
+          showToast("Bu detal soz! Faqat nosoz detalni oling.");
+        }
+      } else {
+        el.style.opacity = '1';
+      }
+    });
+
+    slot.appendChild(el);
+  }
+
+  function renderInventory() {
+    const row = document.getElementById('inventory-row');
+    row.innerHTML = '';
+    let total = 0;
+
+    Object.keys(partsMeta).forEach(type => {
+      const count = inventory[type];
+      total += count;
+      const meta = partsMeta[type];
+
+      const card = document.createElement('div');
+      card.className = `part-card ${count === 0 ? 'empty' : ''}`;
+      card.innerHTML = `
+        <div class="part-icon ${meta.visClass}">${meta.icon}</div>
+        <div class="part-name">${meta.name}</div>
+        <div class="part-count">×${count}</div>
+      `;
+
+      let draggingNew = false;
+      let ghost = null;
+      const targetSlot = document.getElementById('slot-' + type);
+
+      card.addEventListener('pointerdown', (e) => {
+        if (inventory[type] <= 0) {
+          playError();
+          showToast("Detal tugagan! Do'kondan oling.");
+          return;
+        }
+        if (!coverOpen) {
+          playError();
+          showToast("Avval orqa qopqoqni surib oching!");
+          return;
+        }
+        draggingNew = true;
+        targetSlot.classList.add('highlight');
+
+        ghost = document.createElement('div');
+        ghost.className = `part-icon ${meta.visClass} dragging-ghost`;
+        ghost.style.width = '54px';
+        ghost.style.height = '54px';
+        ghost.innerText = meta.icon;
+        ghost.style.left = e.clientX + 'px';
+        ghost.style.top = e.clientY + 'px';
+        document.body.appendChild(ghost);
+        card.setPointerCapture(e.pointerId);
+      });
+
+      card.addEventListener('pointermove', (e) => {
+        if (!draggingNew || !ghost) return;
+        ghost.style.left = e.clientX + 'px';
+        ghost.style.top = e.clientY + 'px';
+      });
+
+      card.addEventListener('pointerup', (e) => {
+        if (!draggingNew) return;
+        draggingNew = false;
+        try { card.releasePointerCapture(e.pointerId); } catch (_) {}
+        targetSlot.classList.remove('highlight');
+        if (ghost) ghost.remove();
+
+        const r = targetSlot.getBoundingClientRect();
+        const overSlot = (e.clientX >= r.left - 18 && e.clientX <= r.right + 18 && e.clientY >= r.top - 18 && e.clientY <= r.bottom + 18);
+
+        if (overSlot) {
+          if (targetSlot.querySelector('.installed-part')) {
+            playError();
+            showToast("Avval eski detalni chiqindiga tashlang!");
+          } else {
+            playSnap();
+            inventory[type]--;
+            saveGame();
+            targetSlot.innerHTML = '';
+            createInstalledPart(targetSlot, type, false);
+            renderInventory();
+            showToast(`${meta.name} o'rnatildi!`);
+            updateHint();
+          }
+        }
+      });
+
+      row.appendChild(card);
+    });
+
+    document.getElementById('total-parts').innerText = `${total} ta detal`;
+    document.getElementById('money').innerText = money;
+  }
+
+  function updateHint() {
+    const hint = document.getElementById('hint-text');
+    const targetSlot = document.getElementById('slot-' + currentOrder.problem);
+    const installed = targetSlot.querySelector('.installed-part');
+
+    if (!coverOpen && installed && installed.dataset.broken === '1') {
+      hint.innerText = "1-qadam: Qopqoqni barmoq bilan surib oching";
+    } else if (coverOpen && installed && installed.dataset.broken === '1') {
+      hint.innerText = `2-qadam: Nosoz ${partsMeta[currentOrder.problem].name}ni chiqindiga suring`;
+    } else if (coverOpen && !installed) {
+      hint.innerText = `3-qadam: Yangi ${partsMeta[currentOrder.problem].name}ni joyiga suring`;
+    } else if (coverOpen && installed && installed.dataset.broken === '0') {
+      hint.innerText = "4-qadam: Endi orqa qopqoqni surib yoping";
+    } else if (!coverOpen && installed && installed.dataset.broken === '0') {
+      hint.innerText = "Tayyor! '✓ Ta'mirlash' tugmasini bosing";
+    }
+  }
+
+  function completeRepair() {
+    const targetSlot = document.getElementById('slot-' + currentOrder.problem);
+    const installed = targetSlot.querySelector('.installed-part');
+
+    if (!installed || installed.dataset.broken === '1') {
+      playError();
+      showToast("Nosoz detal hali almashtirilmagan!");
+      return;
+    }
+    if (coverOpen) {
+      playError();
+      showToast("Avval orqa qopqoqni yoping!");
+      return;
+    }
+
+    const deskInfo = deskUpgrades.find(d => d.level === deskLevel) || deskUpgrades[0];
+    const earned = Math.round(currentOrder.reward * (1 + deskInfo.bonus / 100));
+    playCoin();
+    money += earned;
+    saveGame();
+    document.getElementById('money').innerText = money;
+    showToast(`Ta'mirlandi! +$${earned}`);
+    setTimeout(newOrder, 900);
+  }
+
+  // --- TUGMALAR VA MODALLAR ---
+  function openModal(id) {
+    playClick();
+    document.getElementById(id).classList.add('open');
+  }
+
+  document.querySelectorAll('.close-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      playClick();
+      document.getElementById(btn.dataset.close).classList.remove('open');
+    });
+  });
+
+  document.getElementById('btn-refresh').addEventListener('click', () => { playClick(); newOrder(); });
+  document.getElementById('btn-repair').addEventListener('click', completeRepair);
+
+  document.getElementById('btn-shop').addEventListener('click', () => {
+    const list = document.getElementById('shop-list');
+    list.innerHTML = '';
+    Object.keys(partsMeta).forEach(type => {
+      const m = partsMeta[type];
+      const row = document.createElement('div');
+      row.className = 'shop-item';
+      row.innerHTML = `
+        <div>
+          <b>${m.icon} ${m.name}</b>
+          <div style="font-size:11px;color:var(--text-sub);">Omborda: ${inventory[type]} ta</div>
+        </div>
+        <button class="buy-btn">$${m.price}</button>
+      `;
+      row.querySelector('.buy-btn').addEventListener('click', () => {
+        if (money >= m.price) {
+          playCoin();
+          money -= m.price;
+          inventory[type]++;
+          saveGame();
+          renderInventory();
+          document.getElementById('btn-shop').click();
+          showToast(`${m.name} olindi!`);
+        } else {
+          playError();
+          showToast("Mablag' yetarli emas!");
+        }
+      });
+      list.appendChild(row);
+    });
+    openModal('shop-modal');
+  });
+
+  document.getElementById('btn-work').addEventListener('click', () => {
+    const list = document.getElementById('workshop-list');
+    list.innerHTML = '';
+    deskUpgrades.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'shop-item';
+      const isOwned = deskLevel >= item.level;
+      const isNext = deskLevel + 1 === item.level;
+      row.innerHTML = `
+        <div style="padding-right:8px;">
+          <b>Lvl ${item.level}: ${item.name}</b>
+          <div style="font-size:11px;color:var(--text-sub);">${item.desc}</div>
+        </div>
+        <div class="action-area"></div>
+      `;
+      const area = row.querySelector('.action-area');
+      if (isOwned) {
+        area.innerHTML = `<span style="color:#16a34a;font-weight:800;font-size:11px;">✓ O'rnatilgan</span>`;
+      } else if (isNext) {
+        const b = document.createElement('button');
+        b.className = 'buy-btn';
+        b.innerText = `$${item.cost}`;
+        b.addEventListener('click', () => {
+          if (money >= item.cost) {
+            playCoin();
+            money -= item.cost;
+            deskLevel = item.level;
+            saveGame();
+            applySavedVisuals();
+            document.getElementById('btn-work').click();
+            showToast(`${item.name} o'rnatildi!`);
+          } else {
+            playError();
+            showToast("Mablag' yetarli emas!");
+          }
+        });
+        area.appendChild(b);
+      } else {
+        area.innerHTML = `<button class="buy-btn" disabled>Qulf</button>`;
+      }
+      list.appendChild(row);
+    });
+    openModal('workshop-modal');
+  });
+
+  document.getElementById('btn-set').addEventListener('click', () => openModal('settings-modal'));
+
+  document.getElementById('sound-on-btn').addEventListener('click', () => {
+    soundEnabled = true;
+    saveGame();
+    document.getElementById('sound-on-btn').classList.add('active');
+    document.getElementById('sound-off-btn').classList.remove('active');
+    playSnap();
+  });
+
+  document.getElementById('sound-off-btn').addEventListener('click', () => {
+    playClick();
+    soundEnabled = false;
+    saveGame();
+    document.getElementById('sound-off-btn').classList.add('active');
+    document.getElementById('sound-on-btn').classList.remove('active');
+  });
+
+  document.getElementById('theme-dark-btn').addEventListener('click', () => {
+    playClick();
+    themeMode = 'dark';
+    saveGame();
+    applySavedVisuals();
+  });
+
+  document.getElementById('theme-light-btn').addEventListener('click', () => {
+    playClick();
+    themeMode = 'light';
+    saveGame();
+    applySavedVisuals();
+  });
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.style.opacity = '1';
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => { t.style.opacity = '0'; }, 2000);
+  }
+
+  applySavedVisuals();
+  newOrder();
+</script>
+</body>
+</html>
